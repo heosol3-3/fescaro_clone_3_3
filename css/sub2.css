@@ -4,22 +4,13 @@
 @import url(../css/header.css);
 /* footer.css */
 @import url(../css/footer.css);
-/* spot.css */
-@import url(../css/spot.css);
-/* scroll_down.css */
-@import url(../css/scroll_down.css);
-/* scroll_down.css */
-@import url(../css/btns.css);
-/* font.css */
-@import url(../css/font.css);
-/* sub2.css */
 /* common */
 body::-webkit-scrollbar {
   display: none;
 }
 body {
-  -ms-overflow-style: none; /* 인터넷 익스플로러 */
-  scrollbar-width: none; /* 파이어폭스 */
+  -ms-overflow-style: none; 
+  scrollbar-width: none; 
 }
 html{font-size: .54vw}
 :root{
@@ -28,6 +19,7 @@ html{font-size: .54vw}
 }
 body{font-family: var(--font-family);color: #333;font-size: 1.4rem;}
 a{font-weight: 600;text-decoration: none;color: #fff;}
+
 /* 색변화 공용 */
 #wrap.black #header p,#wrap.black #header a,#wrap.black #header i{opacity: 1;color: #000;}
 

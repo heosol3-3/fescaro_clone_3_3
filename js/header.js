@@ -1,63 +1,57 @@
+// header.js
+
 const wrap = document.querySelector("#wrap");
 const header = document.querySelector("#header");
-const gnb = document.querySelector(".gnb");
-const gnb_menu = document.querySelectorAll(".gnb .gnb_inner>ul>li");
-const btn_sitemap = document.querySelector(".btn_sitemap");
-const sitemap = document.querySelector(".sitemap");
-const side_menu = document.querySelectorAll(".gnb_side .gnb_inner>ul>li")
-let scroll_po = '';
-let page_height = wrap.offsetHeight;
-let page_width = wrap.offsetWidth;
+const topMenu = document.querySelector(".top_menu")
+const gnbMenu = document.querySelector(".gnb>ul");
+const gnbLi = document.querySelectorAll(".gnb>ul>li");
+const gnbDiv = document.querySelectorAll(".gnb>ul>li>div");
+const btnSitemap = document.querySelector(".btn_sitemap");
+const sitemapWrap = document.querySelector(".sitemap_wrap");
+console.log(sitemapWrap);
 
-gnb_menu.forEach((el,i)=>{
-  el.querySelector("a").addEventListener("mouseenter", e=>{
-    e.preventDefault();
-    wrap.classList.add("black");
-    gnb.classList.add("on");
-  });
-  gnb.children[2].addEventListener("mouseleave", e=>{
-    scroll_po = window.pageYOffset;
-    e.preventDefault();
-    wrap.classList.remove("black");
-    gnb.classList.remove("on");
-    if(scroll_po >= sections[2].offsetTop & scroll_po <= sections[3].offsetTop){
-      wrap.classList.add("black");
+
+// header
+for(let el of gnbLi){
+  el.addEventListener("mouseenter",e=>{
+    header.querySelector("h1").classList.add("on");
+    header.querySelector(".header_wrap").style.height = `62.95vh`
+    header.querySelector(".header_wrap").style.background = `#fff`
+    gnbMenu.classList.add("on");
+    e.currentTarget.classList.add("on")
+    topMenu.classList.add("on");
+    for(let el of gnbDiv){
+      el.style.display = "block"
     }
-  });
-
-  el.addEventListener("click", e=>{
-    e.preventDefault();
-    activation(gnb_menu,i,"on");
-    })
-});
-
-side_menu.forEach((el,i) =>{
-  el.addEventListener("click", e=>{
-    e.preventDefault();
-    el.classList.contains("on") ? el.classList.remove("on") : activation(side_menu,i,"on");
+    btnSitemap.classList.add("on");
+    
   })
-})
+  el.addEventListener("mouseleave",e=>{
+    header.querySelector("h1").classList.remove("on");
+    header.querySelector(".header_wrap").style.height = `0vh`
+    header.querySelector(".header_wrap").style.background = `none`
+    gnbMenu.classList.remove("on");
+    el.classList.remove("on");
+    topMenu.classList.remove("on");
+    for(let el of gnbDiv){
+      el.style.display = "none"
+    }
+    btnSitemap.classList.remove("on");
+  })
+}
 
 // sitemap
-btn_sitemap.addEventListener("click",e=>{
-  e.preventDefault();
-  if(header.offsetWidth <= 1270){
-    let mini_menu = document.querySelector(".gnb_side");
-    btn_sitemap.classList.toggle("on");
-    mini_menu.classList.toggle("on");
-  } else{
-  sitemap.style.transitionProperty = `all`;
-  sitemap.classList.add("on");
-  }
-});
-document.querySelector(".btn_close").addEventListener("click",e=>{
-  e.preventDefault();
-  sitemap.style.transitionProperty = `opacity`;
-  sitemap.classList.remove("on");
-});
 
-// function
-function activation(obj,i, name){
-  for(let el of obj) el.classList.remove(name);
-  obj[i].classList.add(name);
-}
+btnSitemap.addEventListener("click",e=>{
+  e.preventDefault();
+  e.currentTarget.classList.toggle("black")
+  sitemapWrap.classList.toggle("on");
+
+})
+
+// 색상변경
+window.addEventListener('wheel',()=>{
+  if(window.offsetTop >= devHeight*2 && window.offsetTop <= devHeight*3){
+    topMenu.classList.add("on");
+  }else{topMenu.classList.remove("on");}
+})
