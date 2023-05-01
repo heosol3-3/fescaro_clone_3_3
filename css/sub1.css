@@ -1,0 +1,7 @@
+.spot{position: relative;width: 100%;height: 100vh; background: #eee url(../images/sub_visual_contact.jpg) no-repeat 100% 0;background-size: cover;}
+.spot ul{display: flex;justify-content:space-between;align-items: center;position: absolute;left: 0;bottom: 0;width: 100%;height: 80px;background: #fff;}
+.spot>ul>li{flex: 1;position: relative;height: 100%;}
+.spot>ul>li>a::after{content: "";display: block;position: absolute;left: 50%;width: 0px;height: 2px;transition: all .3s linear 0s;background: #00AFEB;}
+.spot>ul>li>a:hover::after{display: block;left: 0;width: 100%;}
+.spot>ul>li>a{display: block;line-height: 80px;font-size: 17px;color: #333;text-align: center;transition: all .5s linear 0s;}
+.spot>ul>li>a.on,.spot>ul>li>a:hover{color: #00AFEB;}
