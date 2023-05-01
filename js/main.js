@@ -1,173 +1,315 @@
-// main.js
-
-window.addEventListener('load', () =>{
-
-
-
-const sections = document.querySelectorAll("#container>section");
-console.log(sections);
+const sections = document.querySelectorAll("section");
 const footer = document.querySelector("#footer");
-let fotTop = footer.offsetTop;
-console.log(fotTop);
+const snb = document.querySelectorAll(".snb li a");
+const h2 = document.querySelectorAll("h2.char");
+const p = document.querySelectorAll("p.char");
+const btns = document.querySelector(".btns");
+const btn_top = btns.querySelector(".btn_top")
+const scroll_down = document.querySelector(".scroll_down");
 
-let devHeight;
-devHeight=window.innerHeight;
-console.log(devHeight);
-for(let i=0; i<sections.length; i++){
-  sections[i].style.height = `${devHeight}px`;
-}
+const banner_btns = document.querySelectorAll(".banner_btns i");
+const banner_num = document.querySelectorAll(".banner_btns p span");
+const progress_bar = document.querySelector(".bar span");
+const box = document.querySelector(".banner_inner")
+const banner = document.querySelectorAll(".banner_inner ul");
+let getWidth = banner[0].querySelector("li>.banner").offsetWidth+10;
 
-const lis = document.querySelectorAll(".snb_bar>li");
-console.log(lis);
-lis.forEach((li,i)=>{
-  li.addEventListener("click",e=>{
-    e.preventDefault();
-    window.scroll({
-      top: (i*devHeight),
-      left:0,
-      behavior:"smooth"
-    });
+let banner_position = 0;
+let num = 1;
+
+let slide_width = banner[0].offsetWidth;
+
+// init
+window.addEventListener("resize", e=>{
+  slide_width = banner[0].offsetWidth;
+  page_height = wrap.offsetHeight;
+  page_width = wrap.offsetWidth;
+})
+
+sections[0].classList.add("active");
+let h2_txt ='';
+const gap = 0.03;
+acttach_span(h2);
+acttach_span(p);
+set_transition(h2);
+
+btn_top.addEventListener("click", e=>{
+  e.preventDefault();
+  scrollTo(sections[0],0);
+  active_top(0);
+});
+window.addEventListener("resize", e=>{
+
+})
+// 스크롤
+let flag = 0;
+sections.forEach((el,i) =>{
+  el.addEventListener("wheel", e=>{
+    // console.log(e.deltaY); 아래 => 양수
+    if(page_width > 1270){
+      if(e.deltaY>0 & i==4){
+        e.preventDefault();
+        scrollTo(footer,0);
+        for(let el of sections) el.classList.remove("active");
+        flag = 1;
+        console.log(1)
+      }else if(flag == 1 & i == 4){
+        e.preventDefault();
+        scrollTo(sections[i],i);
+        active_top(i);
+        addClass(sections,i,"active");
+        flag = 0;
+      }
+      else if(e.deltaY > 0 & i < sections.length-1 & flag == 0) {
+        e.preventDefault();
+        scrollTo(sections[i+1],i+1);
+        active_top(i+1);
+        addClass(sections,i+1,"active");
+      }
+      else if(e.deltaY < 0 & i > 0 & flag == 0){
+        e.preventDefault();
+        scrollTo(sections[i-1],i-1);
+        active_top(i-1);
+        addClass(sections,i-1,"active");
+      }
+    }
   });
-  window.addEventListener('resize',()=>{
-    devHeight = window.innerHeight;
-  })
 });
 
-for(let i=0;i<sections.length;i++){
-  sections[i].addEventListener('wheel',e=>{
-    if(e.deltaY < 0){
-      let prev = e.currentTarget.previousElementSibling.offsetTop;
-      window.scroll({
-        top:prev,
-        left:0,
-        behavior:'smooth'
-      });
-    }else if(e.deltaY > 0){
-      let next = e.currentTarget.nextElementSibling.offsetTop;
-      window.scroll({
-        top:next,
-        left:0,
-        behavior:'smooth'
+window.addEventListener("scroll", e=>{
+  scroll_po = window.pageYOffset;
+  let point = page_height - sections[4].offsetHeight - footer.offsetHeight;
+
+  page_width <= 1270 & scroll_po == 0? header.classList.add("top") : header.classList.remove("top"); 
+  if(page_width > 1270){
+    if(scroll_po == point){
+      var btnFix = getAbHeight(btns);
+      var headerFix = getAbHeight(header);
+      var scrollFix = getAbHeight(scroll_down);
+    }
+    if(scroll_po >= point){
+      fixPosition(btns,btnFix);
+      fixPosition(header,headerFix);
+      fixPosition(scroll_down,scrollFix);
+    } else{
+      initTop(header);
+      initTop(btns);
+      initTop(scroll_down );
+    }
+  }
+})
+// snb 클릭
+snb.forEach((el,i) =>{
+  el.addEventListener("click", e=>{
+    e.preventDefault();
+    scrollTo(sections[i],i);
+    active_top(i);
+  });
+});
+
+// content2 오토배너
+let banner_timer = setTimeout(play_banner,1000); 
+
+banners = document.querySelectorAll(`.banner`);
+console.log(banners);
+let focus_idx = 4;
+
+let sec=0;
+function play_banner(){
+  sec == 0 ? progress_bar.style.transitionProperty = `none` : progress_bar.style.transitionProperty = `all`;
+  let width = sec*20;
+  sec++;
+  progress_bar.style.width = `${width}%`;
+  console.log(sec);
+  if(sec > 6) {
+    sec = 0;
+    num++;
+    banner_position--;
+    switch_num(banner_num[0],banner_num[1],num,4)
+    if(num == 4) {
+      num = 0;
+      banner_num[1].innerText = `0${num+1}`;
+    }
+    bannerRotate();
+    turnOnBanner(); 
+    // 이전 버튼을 누를 경우 -값을 받아야함. 
+  }
+  banner_timer = setTimeout(play_banner,1000);
+}
+
+banner_btns.forEach((el, i) =>{
+  el.addEventListener("click", e=>{
+    e.preventDefault();
+    clearTimeout(banner_timer);
+    sec = 0;
+    turnOnBanner();
+
+    if(i == 1) banner_position--;
+    else banner_position++;
+    console.log(banner_position);
+    bannerRotate();
+    banner_timer = setTimeout(play_banner,1000);
+  })
+})
+
+function turnOnBanner(){
+  banners.forEach((el,i) =>{
+    if (el.classList.contains("on")) {
+      if (i == banners.length-1) focus_idx = 0;
+      else focus_idx = i+1;
+      console.log(focus_idx);
+    }
+    el.classList.remove("on");
+  })
+  banners[focus_idx].classList.add("on");
+}
+
+function setTransform(obj,value){
+  obj.style.transform = `translateX(${value}%)`;
+}
+
+function setProperty(obj,value){
+  obj.style.transitionDuration = value;
+} 
+
+function bannerRotate(){
+  setProperty(banner[0],".5s");
+  setProperty(banner[1],".5s");
+  setProperty(banner[2],".5s");
+  setTransform(banner[0],`-0`);
+  setTransform(banner[1],`-0`);
+  setTransform(banner[2],`-0`);
+  if(banner_position > -4 & banner_position <= 0){
+    setProperty(banner[0],"0s");
+      banner[0].style.transform = `translateX(300%)`;
+      console.log(1)
+    } else if (banner_position > -8 & banner_position <= -4){
+      setProperty(banner[1],"0s");
+      setTransform(banner[0],`300`);
+      setTransform(banner[1],`300`);
+      console.log(2)
+    } else if (banner_position > -12 & banner_position <= -8){
+      setProperty(banner[2],"0s");
+      setTransform(banner[0],`300`);
+      setTransform(banner[1],`300`);
+      setTransform(banner[2],`300`);
+      console.log(3)
+    } else if(banner_position <= 4 & banner_position > 0){
+      setProperty(banner[2],"0s");
+      setTransform(banner[2],`-300`);
+      console.log(4)
+    } else if (banner_position <= 8 & banner_position > 4){
+      setProperty(banner[1],"0s");
+      setTransform(banner[1],`-300`);
+      setTransform(banner[2],`-300`);
+      console.log(5)
+    } else if (banner_position < 12 & banner_position > 8){
+      setProperty(banner[0],"0s");
+      setTransform(banner[0],`-300`);
+      setTransform(banner[1],`-300`);
+      setTransform(banner[2],`-300`);
+      console.log(6)
+    } else{
+      console.log(7)
+      banner_position = 0;
+      setProperty(banner[1],".5s");
+      setTransform(banner[0],`0`);
+      setTransform(banner[1],`0`);
+      setTransform(banner[2],`0`);
+    }
+    banner[1].style.left = `${getWidth*banner_position}px`;
+    banner[0].style.left = `${getWidth*banner_position}px`;
+    banner[2].style.left = `${getWidth*banner_position}px`;
+}
+
+// function 모음
+// 1. 초기설정
+function acttach_span(object){
+  object.forEach((el,i) =>{
+    let h2_span = el.querySelectorAll(".char>span");
+    for(let i=0;i<h2_span.length;i++){
+      let arr="";
+      for(let j=0;j<h2_span[i].innerText.length;j++) {
+        h2_span[i].innerText[j] == ' ' ? arr+=` ` : arr+=`<span>${h2_span[i].innerText[j]}</span>`;
+      } 
+      h2_span[i].innerHTML = arr;
+    }
+  });
+}
+function set_transition(object){
+  object.forEach((el,i) =>{
+    let h2_span = el.querySelectorAll(".char>span");
+    for (let el of h2_span){
+      h2_txt = el.querySelectorAll("span");
+      sections.forEach((el,j) =>{
+        if (el.classList.contains("active")){
+          h2_txt.forEach((el,i) =>{
+          el.style.transitionDelay = `${(i*gap)+0.5}s`;
+        }) 
+        }
       })
     }
-  })
+  });
 }
 
-const btnTop = document.querySelector("a.btn_top");
-const btnContact = document.querySelector("a.btn_contact")
+// 2. 동작
+function addClass(obj,idx,name){
+  for(let el of obj) el.classList.remove(name);
+  obj[idx].classList.add(name);
+}
 
+function getAbHeight(target){
+  let targetTop = target.getBoundingClientRect().top;
+  let abTop = sections[4].offsetTop+targetTop;
+  return abTop
+}
 
-btnTop.addEventListener("click",e=>{
-  e.preventDefault();
+function initTop(obj){
+  obj.classList.remove("fix");
+  obj.style.top = `auto`;
+}
+
+function fixPosition(obj,height){
+  obj.classList.add("fix");
+  obj.style.top = `${height}px`;
+}
+
+function active_top(i){
+  if (i == 0){
+    btns.classList.remove("active");
+  }else btns.classList.add("active");
+}
+
+function scrollTo(object,i){
+  let height = object.offsetTop;
+  snb[i].classList.add("on");
   window.scroll({
-    top:0,
-    left:0,
+    top:height,
     behavior:"smooth"
-  })
-})
+  });
+  nav_Interative(i);
+  turn_black(i);
+}
 
-window.addEventListener('scroll',e=>{
-  let scrolls = document.querySelector('html').scrollTop;
-    if(scrolls>=0 && scrolls<devHeight*1-10){
-      btnTop.classList.remove("on","black")
-
-      btnContact.classList.remove("on","bt","black");
-      btnContact.classList.add("bt");
-    }else if(scrolls>=(devHeight*1)-10 && scrolls<devHeight*2-10){
-      btnTop.classList.remove("black");
-      btnTop.classList.add("on");
-      btnContact.classList.remove("black","bt");
-      btnContact.classList.add("on");
-
-    }else if(scrolls>=(devHeight*2)-10 && scrolls<devHeight*3){
-      btnTop.classList.add("black");
-      btnContact.classList.add("black");
-
-    }else if(scrolls>=(devHeight*3)-10 && scrolls<(devHeight*4)+20){
-      btnTop.classList.remove("black","ab");
-      btnTop.classList.add("on");
-      btnContact.classList.remove("black","ab");
-      btnContact.classList.add("on");
-
-    }else{
-      btnTop.classList.remove("on");
-      btnTop.classList.add("ab");
-      btnContact.classList.remove("on");
-      btnContact.classList.add("ab");
-
-    }
-})
-
-
-
-function activation(index,list){
-  for(let el of list){
-    el.classList.remove("on");
+function turn_black(i){
+  wrap.classList.remove("black");
+  if(i==2 || i==3){
+    wrap.classList.add("black");
   }
-  list[index].classList.add("on");
+}
+
+function nav_Interative(i){
+  let bar = document.querySelector(".nav_bar");
+  let prev = document.querySelector(".snb .prev_num");
+  let next = document.querySelector(".snb .next_num");
+  bar.style.height = `${(i+1)*20}%`;
+  switch_num(prev,next,i+1,5);
+}
+
+function switch_num(prev,next,i,length){
+  prev.innerText=`0${i}`;
+  if(i==length) next.innerText=`0${length}`;
+  else next.innerText=`0${i+1}`;
 }
 
 
-const slide_bar = document.querySelector(".slide_bar span");
-const nextNum = document.querySelector(".slide_bar>next_num")
-
-// header.js
-
-const wrap = document.querySelector("#wrap");
-const header = document.querySelector("#header");
-const topMenu = document.querySelector(".top_menu")
-const gnbMenu = document.querySelector(".gnb>ul");
-const gnbLi = document.querySelectorAll(".gnb>ul>li");
-const gnbDiv = document.querySelectorAll(".gnb>ul>li>div");
-const btnSitemap = document.querySelector(".btn_sitemap");
-const sitemapWrap = document.querySelector(".sitemap_wrap");
-console.log(sitemapWrap);
-
-
-// header
-for(let el of gnbLi){
-  el.addEventListener("mouseenter",e=>{
-    header.querySelector("h1").classList.add("on");
-    header.querySelector(".header_wrap").style.height = `62.95vh`
-    header.querySelector(".header_wrap").style.background = `#fff`
-    gnbMenu.classList.add("on");
-    e.currentTarget.classList.add("on")
-    topMenu.classList.add("on");
-    for(let el of gnbDiv){
-      el.style.display = "block"
-    }
-    btnSitemap.classList.add("on");
-    
-  })
-  el.addEventListener("mouseleave",e=>{
-    header.querySelector("h1").classList.remove("on");
-    header.querySelector(".header_wrap").style.height = `0vh`
-    header.querySelector(".header_wrap").style.background = `none`
-    gnbMenu.classList.remove("on");
-    el.classList.remove("on");
-    topMenu.classList.remove("on");
-    for(let el of gnbDiv){
-      el.style.display = "none"
-    }
-    btnSitemap.classList.remove("on");
-  })
-}
-
-// sitemap
-
-btnSitemap.addEventListener("click",e=>{
-  e.preventDefault();
-  e.currentTarget.classList.toggle("black")
-  sitemapWrap.classList.toggle("on");
-
-})
-
-// 색상변경
-window.addEventListener('wheel',()=>{
-  if(window.offsetTop >= devHeight*2 && window.offsetTop <= devHeight*3){
-    topMenu.classList.add("on");
-  }else{topMenu.classList.remove("on");}
-})
-
-
-})
